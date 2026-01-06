@@ -3,13 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <title>Rank Generator</title>
-
 <link href="https://fonts.cdnfonts.com/css/minecraftia" rel="stylesheet">
 
 <style>
 body{
     margin:0;
-    background:#111;
+    background:#0e0f12;
     font-family:Segoe UI,sans-serif;
     color:#fff;
     display:flex;
@@ -17,33 +16,47 @@ body{
     padding:40px;
 }
 
-.wrapper{
-    width:800px;
-    background:#1b1b1b;
-    padding:30px;
+.app{
+    width:900px;
+    background:#1a1b1f;
     border-radius:10px;
+    padding:30px;
+    box-shadow:0 20px 50px #000a;
 }
 
-/* TEXT INPUT OBEN */
-input[type="text"]{
-    width:250px;
-    margin:0 auto 25px auto;
-    display:block;
+/* INPUT OBEN */
+.rank-name{
+    display:flex;
+    justify-content:center;
+    margin-bottom:25px;
+}
+.rank-name input{
+    width:260px;
+    background:#111216;
+    border:1px solid #3a3b40;
     padding:10px;
-    background:#0f0f0f;
-    border:1px solid #555;
-    color:#5fa8ff;
-    text-align:center;
+    color:#7fb3ff;
     border-radius:6px;
+    text-align:center;
+    font-size:14px;
 }
 
 /* PREVIEW */
 .preview{
-    background:#2a2a2a;
+    background:#2b2b2b;
+    border-radius:8px;
     padding:30px;
     display:flex;
     justify-content:center;
     margin-bottom:30px;
+    position:relative;
+}
+.preview span{
+    position:absolute;
+    top:8px;
+    left:10px;
+    font-size:12px;
+    color:#888;
 }
 
 canvas{
@@ -53,87 +66,186 @@ canvas{
 
 /* CONTROLS */
 .controls{
-    max-width:300px;
-    margin:0 auto;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:30px;
 }
 
+.section{
+    background:#14151a;
+    border-radius:8px;
+    padding:20px;
+}
+
+.section h3{
+    margin:0 0 15px;
+    font-weight:400;
+    color:#aaa;
+}
+
+/* ROWS */
 .row{
     display:flex;
     justify-content:space-between;
-    margin-bottom:15px;
+    align-items:center;
+    margin-bottom:12px;
+}
+
+.row label{
+    font-size:14px;
+    color:#bbb;
+}
+
+input[type="color"]{
+    width:46px;
+    height:26px;
+    border:none;
+    background:none;
+    cursor:pointer;
+}
+
+input[type="checkbox"]{
+    transform:scale(1.2);
+}
+
+/* GRADIENT */
+.gradient input{
+    width:100%;
+    margin-bottom:8px;
+    background:#0f1014;
+    border:1px solid #333;
+    padding:8px;
+    color:white;
+    border-radius:4px;
+}
+
+button.add{
+    width:100%;
+    background:#2d7cff;
+    border:none;
+    padding:8px;
+    color:white;
+    border-radius:4px;
+    cursor:pointer;
+}
+button.download{
+    margin-top:30px;
+    width:100%;
+    background:#2d7cff;
+    border:none;
+    padding:15px;
+    font-size:16px;
+    font-weight:bold;
+    color:white;
+    border-radius:6px;
+    cursor:pointer;
 }
 </style>
 </head>
 
 <body>
-<div class="wrapper">
+<div class="app">
 
-<input id="text" type="text" value="creator">
+<div class="rank-name">
+    <input id="rankText" value="CREATOR">
+</div>
 
 <div class="preview">
-    <canvas id="c"></canvas>
+    <span id="sizeLabel"></span>
+    <canvas id="canvas"></canvas>
 </div>
 
 <div class="controls">
-    <div class="row">
-        <span>Background</span>
-        <input id="bg" type="color" value="#3a3a3a">
+
+    <div class="section">
+        <h3>Text</h3>
+        <div class="row">
+            <label>Farbe</label>
+            <input type="color" id="textColor" value="#ffffff">
+        </div>
+        <div class="row">
+            <label>Shadow</label>
+            <input type="checkbox" id="shadow" checked>
+        </div>
+        <div class="row">
+            <label>Border</label>
+            <input type="checkbox" id="border" checked>
+        </div>
     </div>
 
-    <div class="row">
-        <span>Text</span>
-        <input id="tc" type="color" value="#ffffff">
+    <div class="section gradient">
+        <h3>Background (Gradient)</h3>
+        <input class="bg" value="#3a3a3a">
+        <input class="bg" value="#1f1f1f">
+        <button class="add" onclick="addColor()">+ Farbe hinzufügen</button>
     </div>
 
-    <div class="row">
-        <span>Border</span>
-        <input id="border" type="checkbox" checked>
-    </div>
-
-    <div class="row">
-        <span>Shadow</span>
-        <input id="shadow" type="checkbox" checked>
-    </div>
 </div>
+
+<button class="download" onclick="download()">DOWNLOAD PNG</button>
 
 </div>
 
 <script>
-const c = document.getElementById("c");
-const ctx = c.getContext("2d");
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
 
-function draw(){
-    const t = text.value;
-    ctx.font = '8px "Minecraftia"';
+function addColor(){
+    const i=document.createElement("input");
+    i.className="bg";
+    i.value="#000000";
+    i.oninput=render;
+    document.querySelector(".gradient").insertBefore(i,document.querySelector(".add"));
+    render();
+}
 
-    const w = Math.ceil(ctx.measureText(t).width) + 6;
-    const h = 10;
+function render(){
+    const text = rankText.value;
+    ctx.font='8px "Minecraftia"';
+    const w=Math.ceil(ctx.measureText(text).width)+6;
+    const h=10;
 
-    c.width = w;
-    c.height = h;
+    canvas.width=w;
+    canvas.height=h;
 
-    ctx.fillStyle = bg.value;
+    // Gradient BG
+    const colors=[...document.querySelectorAll(".bg")].map(i=>i.value);
+    const g=ctx.createLinearGradient(0,0,0,h);
+    colors.forEach((c,i)=>g.addColorStop(i/(colors.length-1),c));
+    ctx.fillStyle=g;
     ctx.fillRect(0,0,w,h);
 
+    // Border
     if(border.checked){
-        ctx.fillStyle="#777";
+        ctx.fillStyle="#666";
         ctx.fillRect(0,0,w,1);
         ctx.fillRect(0,h-1,w,1);
         ctx.fillRect(0,0,1,h);
         ctx.fillRect(w-1,0,1,h);
     }
 
+    // Shadow
     if(shadow.checked){
         ctx.fillStyle="#000a";
-        ctx.fillText(t,4,9);
+        ctx.fillText(text,4,9);
     }
 
-    ctx.fillStyle=tc.value;
-    ctx.fillText(t,3,8);
+    // Text
+    ctx.fillStyle=textColor.value;
+    ctx.fillText(text,3,8);
+
+    sizeLabel.textContent=`Final Size: ${w}x${h}px`;
 }
 
-document.querySelectorAll("input").forEach(i=>i.oninput=draw);
-document.fonts.ready.then(draw);
+function download(){
+    const a=document.createElement("a");
+    a.download="rank.png";
+    a.href=canvas.toDataURL();
+    a.click();
+}
+
+document.querySelectorAll("input").forEach(i=>i.oninput=render);
+document.fonts.ready.then(render);
 </script>
 
 </body>
