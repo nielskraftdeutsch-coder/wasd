@@ -3,224 +3,243 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rank Generator - ItemsAdder Style</title>
+    <title>RankStudio - ItemsAdder Generator</title>
     <link href="https://fonts.cdnfonts.com/css/minecraftia" rel="stylesheet">
     <style>
         :root {
-            --bg-body: #0f1115;
-            --panel-bg: #181a1f;
-            --input-bg: #24272e;
-            --accent-blue: #007bff;
+            --bg-dark: #121418;
+            --panel-bg: #1a1c20;
+            --accent: #0080ff;
             --text-white: #ffffff;
         }
 
         body {
-            margin: 0;
-            background-color: var(--bg-body);
+            background-color: var(--bg-dark);
             color: var(--text-white);
             font-family: 'Segoe UI', sans-serif;
             display: flex;
             justify-content: center;
-            padding-top: 60px;
+            padding: 40px 20px;
+            margin: 0;
         }
 
         #app {
             width: 100%;
-            max-width: 950px;
+            max-width: 1000px;
             background: var(--panel-bg);
-            border-radius: 6px;
-            padding: 30px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.7);
-            border: 1px solid #2d3139;
+            border-radius: 4px;
+            padding: 25px;
+            border: 1px solid #2d2f35;
         }
 
-        /* Preview Bereich */
-        .preview-box {
-            background: #000;
-            border: 1px solid #333;
-            height: 180px;
+        /* Preview Bereich wie im Screenshot */
+        .preview-section {
+            background-color: #0b0c0e;
+            border: 1px solid #2d2f35;
+            height: 160px;
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-bottom: 25px;
             position: relative;
+            margin-bottom: 20px;
         }
 
         canvas {
-            image-rendering: pixelated;
-            transform: scale(3); /* Zoom für bessere Sichtbarkeit im Editor */
+            image-rendering: pixelated; /* Wichtig für MaceMeme Look */
+            transform: scale(5); /* Vorschau wird groß angezeigt, Datei bleibt klein */
         }
 
-        .res-info {
+        .size-info {
             position: absolute;
-            top: 12px;
-            left: 12px;
+            top: 10px;
+            left: 10px;
             font-size: 12px;
-            color: #555;
+            color: #666;
         }
 
-        /* Controls */
+        /* Controls Grid */
         .editor-grid {
             display: grid;
-            grid-template-columns: 1.2fr 1fr;
+            grid-template-columns: 1fr 1fr;
             gap: 40px;
-            margin-top: 20px;
         }
 
-        .control-item { margin-bottom: 20px; }
+        .input-group { margin-bottom: 20px; }
 
         label {
             display: block;
             font-size: 13px;
-            color: #888;
+            color: #8e9297;
             margin-bottom: 8px;
             text-transform: uppercase;
-            letter-spacing: 1px;
         }
 
         input[type="text"] {
             width: 100%;
-            background: var(--input-bg);
+            background: #25282e;
             border: 1px solid #333;
             padding: 12px;
             color: white;
             border-radius: 4px;
-            font-size: 15px;
             outline: none;
         }
 
-        input[type="text"]:focus { border-color: var(--accent-blue); }
-
-        .btn-main {
-            background: var(--accent-blue);
-            color: white;
-            border: none;
-            padding: 15px 0;
-            width: 100%;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-top: 20px;
-        }
-
-        .btn-main:hover { opacity: 0.9; }
-
-        .color-strip {
-            height: 5px;
+        .color-preview-bar {
+            height: 6px;
             width: 100%;
             margin-top: 5px;
             border-radius: 2px;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        button {
+            border: none;
+            padding: 8px 20px;
+            border-radius: 4px;
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn-blue { background: #007bff; }
+        .btn-red { background: #dc3545; }
+        .btn-green { background: #28a745; }
+
+        .generate-footer {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .main-dl-btn {
+            background: #204a87;
+            padding: 15px 50px;
+            font-size: 16px;
         }
     </style>
 </head>
 <body>
 
 <div id="app">
-    <div style="text-align:center; margin-bottom: 25px;">
-        <h1 style="font-weight: 300; margin:0;">Rank Generator</h1>
+    <header style="text-align: center; margin-bottom: 20px;">
+        <h1 style="font-weight: 400; margin: 0; font-size: 24px;">Prefix Generator</h1>
+    </header>
+
+    <div class="preview-section">
+        <span class="size-info" id="sizeLabel">0x0</span>
+        <canvas id="rankCanvas"></canvas>
     </div>
 
-    <div class="preview-box">
-        <span class="res-info" id="resText">Size: 0x0</span>
-        <canvas id="rankCanvas"></canvas>
+    <div class="btn-row">
+        <button class="btn-blue">Copy</button>
+        <button class="btn-red" onclick="location.reload()">Clear</button>
+        <button class="btn-green" onclick="downloadImage()">Save</button>
     </div>
 
     <div class="editor-grid">
         <div>
-            <div class="control-item">
+            <div class="input-group">
                 <label>Rank Name</label>
-                <input type="text" id="rName" value="ADMIN">
+                <input type="text" id="rName" value="MEMBER">
             </div>
-            <div class="control-item">
-                <label>Text Farbe</label>
-                <input type="text" id="tColor" value="#FFFFFF">
-                <div id="tStrip" class="color-strip"></div>
-            </div>
-            <div class="control-item">
-                <label>Schatten Farbe</label>
+            <div class="input-group">
+                <label>Shadow Color</label>
                 <input type="text" id="sColor" value="#333333">
-                <div id="sStrip" class="color-strip"></div>
+                <div id="sBar" class="color-preview-bar"></div>
+            </div>
+            <div class="input-group">
+                <label>Text Color</label>
+                <input type="text" id="tColor" value="#FFFFFF">
+                <div id="tBar" class="color-preview-bar"></div>
             </div>
         </div>
 
         <div>
-            <label style="margin-bottom: 15px; display: block;">Hintergrund Design</label>
-            <div class="control-item">
-                <label>Farbe Oben (Hex)</label>
-                <input type="text" id="bg1" value="#ff5555">
-                <div id="bg1Strip" class="color-strip"></div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                <button class="btn-green" style="padding: 5px 10px;">Add New Color</button>
+                <span style="font-size: 12px; color: #555;">Gradient Mode</span>
             </div>
-            <div class="control-item">
-                <label>Farbe Unten (Hex)</label>
-                <input type="text" id="bg2" value="#aa0000">
-                <div id="bg2Strip" class="color-strip"></div>
+            <div class="input-group">
+                <label>Background Top</label>
+                <input type="text" id="bg1" value="#444444">
+                <div id="bg1Bar" class="color-preview-bar"></div>
+            </div>
+            <div class="input-group">
+                <label>Background Bottom</label>
+                <input type="text" id="bg2" value="#222222">
+                <div id="bg2Bar" class="color-preview-bar"></div>
             </div>
         </div>
     </div>
 
-    <button class="btn-main" onclick="download()">GENERATE & DOWNLOAD</button>
+    <div class="generate-footer">
+        <button class="main-dl-btn" onclick="downloadImage()">Generate & Download</button>
+    </div>
 </div>
 
 <script>
     const canvas = document.getElementById('rankCanvas');
     const ctx = canvas.getContext('2d');
 
-    function update() {
+    function draw() {
         const name = document.getElementById('rName').value.toUpperCase();
-        const tColor = document.getElementById('tColor').value;
-        const sColor = document.getElementById('sColor').value;
-        const bg1 = document.getElementById('bg1').value;
-        const bg2 = document.getElementById('bg2').value;
+        const tCol = document.getElementById('tColor').value;
+        const sCol = document.getElementById('sColor').value;
+        const b1 = document.getElementById('bg1').value;
+        const b2 = document.getElementById('bg2').value;
 
-        // UI Strips
-        document.getElementById('tStrip').style.background = tColor;
-        document.getElementById('sStrip').style.background = sColor;
-        document.getElementById('bg1Strip').style.background = bg1;
-        document.getElementById('bg2Strip').style.background = bg2;
+        // UI Balken Farben
+        document.getElementById('tBar').style.background = tCol;
+        document.getElementById('sBar').style.background = sCol;
+        document.getElementById('bg1Bar').style.background = b1;
+        document.getElementById('bg2Bar').style.background = b2;
 
-        // Minecraft Font Rendering
+        // Schriftart für Messung setzen (klein für Mace-Ranks)
         ctx.font = '8px "Minecraftia"';
         const textWidth = Math.ceil(ctx.measureText(name).width);
         
-        // Pixel-Format (Kompakt wie Mace)
+        // Canvas Größe festlegen (MaceMeme Ranks sind ca. 9-10px hoch)
         canvas.width = textWidth + 4;
         canvas.height = 10;
-        document.getElementById('resText').innerText = `Final Size: ${canvas.width}x${canvas.height}px`;
+        document.getElementById('sizeLabel').innerText = `${canvas.width}x${canvas.height}`;
 
-        // Hintergrund Verlauf zeichnen
-        const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-        gradient.addColorStop(0, bg1);
-        gradient.addColorStop(1, bg2);
-        
-        ctx.fillStyle = gradient;
+        // Hintergrund mit Verlauf
+        const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+        grad.addColorStop(0, b1);
+        grad.addColorStop(1, b2);
+        ctx.fillStyle = grad;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Minecraft Text Style (Schatten 1px versetzt)
-        ctx.font = '8px "Minecraftia"';
+        // Text Rendering (Minecraft Pixel Style)
         ctx.textAlign = 'left';
+        ctx.textBaseline = 'alphabetic';
 
-        // Schatten
-        ctx.fillStyle = sColor;
+        // 1. Schatten (1px Versatz)
+        ctx.fillStyle = sCol;
         ctx.fillText(name, 2.5, 8.5);
 
-        // Haupt-Text
-        ctx.fillStyle = tColor;
+        // 2. Haupttext
+        ctx.fillStyle = tCol;
         ctx.fillText(name, 2, 8);
     }
 
-    function download() {
+    function downloadImage() {
         const link = document.createElement('a');
         link.download = `rank_${document.getElementById('rName').value}.png`;
-        link.href = canvas.toDataURL('image/png');
+        link.href = canvas.toDataURL();
         link.click();
     }
 
-    // Live-Update bei jeder Eingabe
-    document.querySelectorAll('input').forEach(i => i.addEventListener('input', update));
+    // Live-Update bei Tippen
+    document.querySelectorAll('input').forEach(i => i.addEventListener('input', draw));
     
-    // Warten bis Schriftart geladen ist
-    document.fonts.ready.then(update);
+    // Warten auf Font
+    document.fonts.ready.then(draw);
 </script>
 
 </body>
