@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ItemsAdder Rank Generator</title>
+    <link href="https://fonts.cdnfonts.com/css/minecraftia" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #1a1c23;
+            --panel-color: #242731;
+            --accent-color: #3b82f6;
+            --text-color: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px;
+        }
+
+        .container {
+            background-color: var(--panel-color);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .preview-box {
+            background: #000;
+            border: 2px solid #333;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            min-height: 120px;
+        }
+
+        canvas {
+            image-rendering: pixelated;
+            max-width: 100%;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+            color: #aaa;
+        }
+
+        input[type="text"], input[type="color"] {
+            width: 100%;
+            padding: 10px;
+            background: #1a1c23;
+            border: 1px solid #444;
+            color: white;
+            border-radius: 4px;
+        }
+
+        .btn-group {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .btn-primary { background-color: var(--accent-color); color: white; }
+        .btn-success { background-color: #10b981; color: white; }
+        .btn-danger { background-color: #ef4444; color: white; }
+
+        button:hover { opacity: 0.8; }
+    </style>
+</head>
+<body>
+
+    <h1>ItemsAdder Rank Generator</h1>
+
+    <div class="container">
+        <div class="preview-box">
+            <canvas id="rankCanvas" width="300" height="80"></canvas>
+        </div>
+
+        <div class="controls">
+            <div>
+                <div class="input-group">
+                    <label>Rank Name</label>
+                    <input type="text" id="rankText" value="ADMIN" placeholder="Z.B. ADMIN">
+                </div>
+                <div class="input-group">
+                    <label>Text Farbe</label>
+                    <input type="color" id="textColor" value="#ffffff">
+                </div>
+                <div class="input-group">
+                    <label>Schatten Farbe</label>
+                    <input type="color" id="shadowColor" value="#333333">
+                </div>
+            </div>
+
+            <div>
+                <div class="input-group">
+                    <label>Hintergrund Farbe 1</label>
+                    <input type="color" id="bgColor1" value="#00AAFF">
+                </div>
+                <div class="input-group">
+                    <label>Hintergrund Farbe 2 (Verlauf)</label>
+                    <input type="color" id="bgColor2" value="#00CCFF">
+                </div>
+                <div class="input-group">
+                    <input type="checkbox" id="showBorder" checked> <label style="display:inline">Rahmen anzeigen</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <button class="btn-primary" onclick="generateImage()">Vorschau Aktualisieren</button>
+            <button class="btn-success" onclick="downloadImage()">Download PNG</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('rankCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function generateImage() {
+            const text = document.getElementById('rankText').value;
+            const textColor = document.getElementById('textColor').value;
+            const shadowColor = document.getElementById('shadowColor').value;
+            const bg1 = document.getElementById('bgColor1').value;
+            const bg2 = document.getElementById('bgColor2').value;
+            const showBorder = document.getElementById('showBorder').checked;
+
+            // Canvas leeren
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 1. Hintergrund Verlauf
+            let gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, bg1);
+            gradient.addColorStop(1, bg2);
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // 2. Rahmen (Optional)
+            if(showBorder) {
+                ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+                ctx.lineWidth = 4;
+                ctx.strokeRect(2, 2, canvas.width - 4, canvas.height - 4);
+            }
+
+            // 3. Text Zeichnen
+            ctx.font = '40px "Minecraftia", sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            // Schatten
+            ctx.fillStyle = shadowColor;
+            ctx.fillText(text, (canvas.width / 2) + 3, (canvas.height / 2) + 3);
+
+            // Haupttext
+            ctx.fillStyle = textColor;
+            ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+        }
+
+        function downloadImage() {
+            const link = document.createElement('a');
+            link.download = 'rank.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+
+        // Initial beim Laden generieren
+        window.onload = generateImage;
+        // Bei jeder Eingabe sofort aktualisieren
+        document.querySelectorAll('input').forEach(el => el.oninput = generateImage);
+    </script>
+
+</body>
+</html>
