@@ -1,412 +1,204 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RankStudio - MaceMeme Style</title>
-    <link href="https://fonts.cdnfonts.com/css/minecraftia" rel="stylesheet">
-    <style>
-        :root {
-            --bg-dark: #0d0f12;
-            --panel: #16181d;
-            --input: #1e2126;
-            --accent: #0080ff;
-        }
+<meta charset="UTF-8">
+<title>Rank Generator</title>
+<link href="https://fonts.cdnfonts.com/css/minecraftia" rel="stylesheet">
 
-        body {
-            background-color: var(--bg-dark);
-            color: white;
-            font-family: 'Segoe UI', sans-serif;
-            display: flex;
-            justify-content: center;
-            padding: 40px;
-            margin: 0;
-        }
+<style>
+body{
+    margin:0;
+    background:#0b0d10;
+    font-family:Segoe UI,sans-serif;
+    color:#fff;
+    display:flex;
+    justify-content:center;
+    padding:40px;
+}
 
-        #app {
-            width: 100%;
-            max-width: 900px;
-            background: var(--panel);
-            padding: 25px;
-            border-radius: 8px;
-            border: 1px solid #2d2f35;
-        }
+#app{
+    width:900px;
+    background:#14161b;
+    border:1px solid #2a2d34;
+    border-radius:8px;
+    padding:25px;
+}
 
-        /* Vorschau oben wie gewünscht */
-        .preview-header {
-            background: #000;
-            border: 1px solid #333;
-            height: 150px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 25px;
-            border-radius: 4px;
-        }
+h1{
+    text-align:center;
+    font-weight:400;
+    margin-bottom:25px;
+}
 
-        canvas {
-            image-rendering: pixelated;
-            transform: scale(4); /* Scharfe Pixel-Ansicht */
-        }
+/* PREVIEW */
+.preview{
+    background:#000;
+    border:1px solid #333;
+    border-radius:4px;
+    height:170px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+    margin-bottom:25px;
+}
 
-        .editor-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-        }
+.preview span{
+    position:absolute;
+    top:8px;
+    left:10px;
+    font-size:12px;
+    color:#777;
+}
 
-        .field { margin-bottom: 15px; }
+canvas{
+    image-rendering:pixelated;
+    transform:scale(4);
+}
 
-        label {
-            display: block;
-            font-size: 12px;
-            color: #888;
-            margin-bottom: 5px;
-            text-transform: uppercase;
-        }
+/* UI */
+.grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:30px;
+}
 
-        input {
-            width: 100%;
-            background: var(--input);
-            border: 1px solid #333;
-            padding: 10px;
-            color: white;
-            border-radius: 4px;
-            outline: none;
-            box-sizing: border-box;
-        }
+label{
+    font-size:12px;
+    color:#888;
+    text-transform:uppercase;
+}
 
-        input:focus { border-color: var(--accent); }
+input{
+    width:100%;
+    background:#1e2126;
+    border:1px solid #333;
+    padding:10px;
+    color:white;
+    border-radius:4px;
+    margin-bottom:12px;
+}
 
-        .gradient-box {
-            background: #1e2126;
-            padding: 15px;
-            border-radius: 4px;
-            border: 1px dashed #444;
-        }
+.toggle{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:10px;
+}
 
-        .btn-add {
-            background: #28a745;
-            color: white;
-            border: none;
-            padding: 8px;
-            width: 100%;
-            margin-top: 10px;
-            cursor: pointer;
-            border-radius: 4px;
-            font-weight: bold;
-        }
-
-        .btn-download {
-            background: var(--accent);
-            color: white;
-            border: none;
-            padding: 15px;
-            width: 100%;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 20px;
-            border-radius: 4px;
-        }
-    </style>
+button{
+    width:100%;
+    background:#007bff;
+    border:none;
+    padding:15px;
+    font-weight:bold;
+    color:white;
+    border-radius:4px;
+    cursor:pointer;
+}
+</style>
 </head>
+
 <body>
-
 <div id="app">
-    <div class="preview-header">
-        <canvas id="rankCanvas"></canvas>
-    </div>
 
-    <div class="editor-grid">
-        <div>
-            <div class="field">
-                <label>Rang Name (Klein/Groß möglich)</label>
-                <input type="text" id="rName" value="trat">
-            </div>
-            <div class="field">
-                <label>Text Farbe (Hex)</label>
-                <input type="text" id="tCol" value="#FFFFFF">
-            </div>
-            <div class="field">
-                <label>Schatten Farbe (Hex)</label>
-                <input type="text" id="sCol" value="#222222aa">
-            </div>
+<h1>Rank Generator</h1>
+
+<div class="preview">
+    <span id="sizeLabel"></span>
+    <canvas id="c"></canvas>
+</div>
+
+<div class="grid">
+    <div>
+        <label>Rank Name</label>
+        <input id="text" value="CREATOR">
+
+        <label>Text Farbe</label>
+        <input id="tCol" value="#ffffff">
+
+        <label>Schatten Farbe</label>
+        <input id="sCol" value="#000000aa">
+
+        <div class="toggle">
+            <input type="checkbox" id="shadow" checked>
+            <label>Shadow</label>
         </div>
 
-        <div>
-            <label>Hintergrund Farben (Gradient)</label>
-            <div id="gradientFields" class="gradient-list">
-                <input type="text" class="bg-stop" value="#d400ff" style="margin-bottom:5px;">
-                <input type="text" class="bg-stop" value="#8000ff">
-            </div>
-            <button class="btn-add" onclick="addField()">+ Weitere Farbe</button>
+        <div class="toggle">
+            <input type="checkbox" id="border" checked>
+            <label>Border</label>
         </div>
     </div>
 
-    <button class="btn-download" onclick="download()">DOWNLOAD PNG</button>
+    <div>
+        <label>Background Farben (oben → unten)</label>
+        <input class="bg" value="#3b3b3b">
+        <input class="bg" value="#1f1f1f">
+    </div>
+</div>
+
+<br>
+<button onclick="download()">DOWNLOAD PNG</button>
+
 </div>
 
 <script>
-    const canvas = document.getElementById('rankCanvas');
-    const ctx = canvas.getContext('2d');
+const c = document.getElementById("c");
+const ctx = c.getContext("2d");
 
-    function addField() {
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.className = 'bg-stop';
-        input.value = '#000000';
-        input.style.marginTop = '5px';
-        input.oninput = render;
-        document.getElementById('gradientFields').appendChild(input);
-        render();
+function render(){
+    const text = text.value;
+    const tColor = tCol.value;
+    const sColor = sCol.value;
+    const bg = [...document.querySelectorAll(".bg")].map(i=>i.value);
+    const drawShadow = shadow.checked;
+    const drawBorder = border.checked;
+
+    ctx.font = '8px "Minecraftia"';
+    const w = Math.ceil(ctx.measureText(text).width) + 6;
+    const h = 10;
+
+    c.width = w;
+    c.height = h;
+
+    // Background
+    const g = ctx.createLinearGradient(0,0,0,h);
+    bg.forEach((c,i)=>g.addColorStop(i/(bg.length-1),c));
+    ctx.fillStyle = g;
+    ctx.fillRect(0,0,w,h);
+
+    // Border
+    if(drawBorder){
+        ctx.fillStyle="#555";
+        ctx.fillRect(0,0,w,1);
+        ctx.fillRect(0,h-1,w,1);
+        ctx.fillRect(0,0,1,h);
+        ctx.fillRect(w-1,0,1,h);
     }
 
-    function render() {
-        const text = document.getElementById('rName').value;
-        const tColor = document.getElementById('tCol').value;
-        const sColor = document.getElementById('sCol').value;
-        const stops = Array.from(document.getElementsByClassName('bg-stop')).map(i => i.value);
-
-        ctx.font = '8px "Minecraftia"';
-        const textWidth = Math.ceil(ctx.measureText(text).width);
-        
-        // MaceMeme Format: 10px hoch
-        canvas.width = textWidth + 6;
-        canvas.height = 10;
-
-        // Hintergrund Verlauf
-        const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-        stops.forEach((color, i) => {
-            grad.addColorStop(i / (stops.length - 1), color);
-        });
-        ctx.fillStyle = grad;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        // Schatten Rendering
+    // Shadow
+    if(drawShadow){
         ctx.fillStyle = sColor;
-        ctx.fillText(text, 3.5, 8.5);
-
-        // Haupttext Rendering
-        ctx.fillStyle = tColor;
-        ctx.fillText(text, 3, 8);
+        ctx.fillText(text,4,9);
     }
 
-    function download() {
-        const link = document.createElement('a');
-        link.download = 'rank.png';
-        link.href = canvas.toDataURL();
-        link.click();
-    }
+    // Text
+    ctx.fillStyle = tColor;
+    ctx.fillText(text,3,8);
 
-    document.querySelectorAll('input').forEach(i => i.oninput = render);
-    document.fonts.ready.then(render);
-</script>
+    sizeLabel.textContent = `Final Size: ${w}×${h}px`;
+}
 
-</body>
-</html><!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RankStudio - MaceMeme Style</title>
-    <link href="https://fonts.cdnfonts.com/css/minecraftia" rel="stylesheet">
-    <style>
-        :root {
-            --bg-dark: #0d0f12;
-            --panel: #16181d;
-            --input: #1e2126;
-            --accent: #0080ff;
-        }
+function download(){
+    const a=document.createElement("a");
+    a.download="rank.png";
+    a.href=c.toDataURL();
+    a.click();
+}
 
-        body {
-            background-color: var(--bg-dark);
-            color: white;
-            font-family: 'Segoe UI', sans-serif;
-            display: flex;
-            justify-content: center;
-            padding: 40px;
-            margin: 0;
-        }
-
-        #app {
-            width: 100%;
-            max-width: 900px;
-            background: var(--panel);
-            padding: 25px;
-            border-radius: 8px;
-            border: 1px solid #2d2f35;
-        }
-
-        /* Vorschau oben wie gewünscht */
-        .preview-header {
-            background: #000;
-            border: 1px solid #333;
-            height: 150px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 25px;
-            border-radius: 4px;
-        }
-
-        canvas {
-            image-rendering: pixelated;
-            transform: scale(4); /* Scharfe Pixel-Ansicht */
-        }
-
-        .editor-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-        }
-
-        .field { margin-bottom: 15px; }
-
-        label {
-            display: block;
-            font-size: 12px;
-            color: #888;
-            margin-bottom: 5px;
-            text-transform: uppercase;
-        }
-
-        input {
-            width: 100%;
-            background: var(--input);
-            border: 1px solid #333;
-            padding: 10px;
-            color: white;
-            border-radius: 4px;
-            outline: none;
-            box-sizing: border-box;
-        }
-
-        input:focus { border-color: var(--accent); }
-
-        .gradient-box {
-            background: #1e2126;
-            padding: 15px;
-            border-radius: 4px;
-            border: 1px dashed #444;
-        }
-
-        .btn-add {
-            background: #28a745;
-            color: white;
-            border: none;
-            padding: 8px;
-            width: 100%;
-            margin-top: 10px;
-            cursor: pointer;
-            border-radius: 4px;
-            font-weight: bold;
-        }
-
-        .btn-download {
-            background: var(--accent);
-            color: white;
-            border: none;
-            padding: 15px;
-            width: 100%;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 20px;
-            border-radius: 4px;
-        }
-    </style>
-</head>
-<body>
-
-<div id="app">
-    <div class="preview-header">
-        <canvas id="rankCanvas"></canvas>
-    </div>
-
-    <div class="editor-grid">
-        <div>
-            <div class="field">
-                <label>Rang Name (Klein/Groß möglich)</label>
-                <input type="text" id="rName" value="trat">
-            </div>
-            <div class="field">
-                <label>Text Farbe (Hex)</label>
-                <input type="text" id="tCol" value="#FFFFFF">
-            </div>
-            <div class="field">
-                <label>Schatten Farbe (Hex)</label>
-                <input type="text" id="sCol" value="#222222aa">
-            </div>
-        </div>
-
-        <div>
-            <label>Hintergrund Farben (Gradient)</label>
-            <div id="gradientFields" class="gradient-list">
-                <input type="text" class="bg-stop" value="#d400ff" style="margin-bottom:5px;">
-                <input type="text" class="bg-stop" value="#8000ff">
-            </div>
-            <button class="btn-add" onclick="addField()">+ Weitere Farbe</button>
-        </div>
-    </div>
-
-    <button class="btn-download" onclick="download()">DOWNLOAD PNG</button>
-</div>
-
-<script>
-    const canvas = document.getElementById('rankCanvas');
-    const ctx = canvas.getContext('2d');
-
-    function addField() {
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.className = 'bg-stop';
-        input.value = '#000000';
-        input.style.marginTop = '5px';
-        input.oninput = render;
-        document.getElementById('gradientFields').appendChild(input);
-        render();
-    }
-
-    function render() {
-        const text = document.getElementById('rName').value;
-        const tColor = document.getElementById('tCol').value;
-        const sColor = document.getElementById('sCol').value;
-        const stops = Array.from(document.getElementsByClassName('bg-stop')).map(i => i.value);
-
-        ctx.font = '8px "Minecraftia"';
-        const textWidth = Math.ceil(ctx.measureText(text).width);
-        
-        // MaceMeme Format: 10px hoch
-        canvas.width = textWidth + 6;
-        canvas.height = 10;
-
-        // Hintergrund Verlauf
-        const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-        stops.forEach((color, i) => {
-            grad.addColorStop(i / (stops.length - 1), color);
-        });
-        ctx.fillStyle = grad;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        // Schatten Rendering
-        ctx.fillStyle = sColor;
-        ctx.fillText(text, 3.5, 8.5);
-
-        // Haupttext Rendering
-        ctx.fillStyle = tColor;
-        ctx.fillText(text, 3, 8);
-    }
-
-    function download() {
-        const link = document.createElement('a');
-        link.download = 'rank.png';
-        link.href = canvas.toDataURL();
-        link.click();
-    }
-
-    document.querySelectorAll('input').forEach(i => i.oninput = render);
-    document.fonts.ready.then(render);
+document.querySelectorAll("input").forEach(i=>i.oninput=render);
+document.fonts.ready.then(render);
 </script>
 
 </body>
