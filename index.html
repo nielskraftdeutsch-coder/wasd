@@ -3,12 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <title>Rank Generator</title>
+
 <link href="https://fonts.cdnfonts.com/css/minecraftia" rel="stylesheet">
 
 <style>
 body{
     margin:0;
-    background:#0c0e11;
+    background:#111;
     font-family:Segoe UI,sans-serif;
     color:#fff;
     display:flex;
@@ -16,36 +17,30 @@ body{
     padding:40px;
 }
 
-.panel{
-    width:850px;
-    background:#1a1c20;
-    border-radius:10px;
+.wrapper{
+    width:800px;
+    background:#1b1b1b;
     padding:30px;
-    box-shadow:0 10px 40px #000a;
+    border-radius:10px;
 }
 
-/* INPUT OBEN */
-.rank-input{
-    width:260px;
+/* TEXT INPUT OBEN */
+input[type="text"]{
+    width:250px;
     margin:0 auto 25px auto;
-}
-
-.rank-input input{
-    width:100%;
+    display:block;
     padding:10px;
-    background:#121318;
-    border:1px solid #444;
-    color:#7fb3ff;
-    border-radius:6px;
-    font-size:14px;
+    background:#0f0f0f;
+    border:1px solid #555;
+    color:#5fa8ff;
     text-align:center;
+    border-radius:6px;
 }
 
 /* PREVIEW */
-.preview-box{
+.preview{
     background:#2a2a2a;
-    border-radius:8px;
-    padding:25px;
+    padding:30px;
     display:flex;
     justify-content:center;
     margin-bottom:30px;
@@ -56,97 +51,71 @@ canvas{
     transform:scale(4);
 }
 
-/* OPTIONS */
-.options{
-    max-width:400px;
+/* CONTROLS */
+.controls{
+    max-width:300px;
     margin:0 auto;
 }
 
 .row{
     display:flex;
-    align-items:center;
     justify-content:space-between;
     margin-bottom:15px;
-}
-
-.row label{
-    color:#aaa;
-    font-size:14px;
-}
-
-.row input[type="color"]{
-    width:50px;
-    height:26px;
-    border:none;
-    background:none;
-    cursor:pointer;
-}
-
-.row input[type="checkbox"]{
-    transform:scale(1.2);
 }
 </style>
 </head>
 
 <body>
-<div class="panel">
+<div class="wrapper">
 
-<div class="rank-input">
-    <input id="rankText" value="creator">
+<input id="text" type="text" value="creator">
+
+<div class="preview">
+    <canvas id="c"></canvas>
 </div>
 
-<div class="preview-box">
-    <canvas id="rankCanvas"></canvas>
-</div>
-
-<div class="options">
+<div class="controls">
     <div class="row">
-        <label>Background</label>
-        <input type="color" id="bgColor" value="#3a3a3a">
+        <span>Background</span>
+        <input id="bg" type="color" value="#3a3a3a">
     </div>
 
     <div class="row">
-        <label>Text</label>
-        <input type="color" id="textColor" value="#ffffff">
+        <span>Text</span>
+        <input id="tc" type="color" value="#ffffff">
     </div>
 
     <div class="row">
-        <label>Border</label>
-        <input type="checkbox" id="border" checked>
+        <span>Border</span>
+        <input id="border" type="checkbox" checked>
     </div>
 
     <div class="row">
-        <label>Shadow</label>
-        <input type="checkbox" id="shadow" checked>
+        <span>Shadow</span>
+        <input id="shadow" type="checkbox" checked>
     </div>
 </div>
 
 </div>
 
 <script>
-const canvas = document.getElementById("rankCanvas");
-const ctx = canvas.getContext("2d");
+const c = document.getElementById("c");
+const ctx = c.getContext("2d");
 
-function render(){
-    const text = rankText.value;
-    const bg = bgColor.value;
-    const tCol = textColor.value;
-    const drawBorder = border.checked;
-    const drawShadow = shadow.checked;
-
+function draw(){
+    const t = text.value;
     ctx.font = '8px "Minecraftia"';
-    const w = Math.ceil(ctx.measureText(text).width) + 6;
+
+    const w = Math.ceil(ctx.measureText(t).width) + 6;
     const h = 10;
 
-    canvas.width = w;
-    canvas.height = h;
+    c.width = w;
+    c.height = h;
 
-    // Background
-    ctx.fillStyle = bg;
+    ctx.fillStyle = bg.value;
     ctx.fillRect(0,0,w,h);
 
-    // Border
-    if(drawBorder){
+    if(border.checked){
         ctx.fillStyle="#777";
         ctx.fillRect(0,0,w,1);
         ctx.fillRect(0,h-1,w,1);
@@ -154,19 +123,17 @@ function render(){
         ctx.fillRect(w-1,0,1,h);
     }
 
-    // Shadow
-    if(drawShadow){
+    if(shadow.checked){
         ctx.fillStyle="#000a";
-        ctx.fillText(text,4,9);
+        ctx.fillText(t,4,9);
     }
 
-    // Text
-    ctx.fillStyle=tCol;
-    ctx.fillText(text,3,8);
+    ctx.fillStyle=tc.value;
+    ctx.fillText(t,3,8);
 }
 
-document.querySelectorAll("input").forEach(i=>i.oninput=render);
-document.fonts.ready.then(render);
+document.querySelectorAll("input").forEach(i=>i.oninput=draw);
+document.fonts.ready.then(draw);
 </script>
 
 </body>
