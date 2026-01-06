@@ -4,258 +4,104 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>RankStudio - ItemsAdder Generator</title>
-
-    <meta name="description" content="Create pixel-perfect Minecraft rank badges with custom fonts and colors." />
-
-    <meta property="og:title" content="Minecraft Rank Generator" />
-    <meta property="og:description" content="Create pixel-style Minecraft ranks with your own style!" />
-    <meta property="og:type" content="website" />
-
+    <meta name="description" content="Create pixel-perfect Minecraft rank badges." />
     <link href="https://fonts.cdnfonts.com/css/minecraftia" rel="stylesheet">
-    
     <style>
       :root {
-        --bg-dark: #0d0f12;
-        --panel-bg: #16181d;
-        --accent-blue: #0080ff;
-        --input-bg: #1e2126;
-        --text-color: #ffffff;
+        --bg-color: #121212;
+        --card-bg: #1e1e1e;
+        --input-bg: #151520;
+        --accent: #4a5568;
+        --text: #ffffff;
       }
-
       body {
         margin: 0;
-        padding: 0;
-        background-color: var(--bg-dark);
-        color: var(--text-color);
-        font-family: 'Inter', sans-serif;
-        display: flex;
-        justify-content: center;
-        padding-top: 50px;
-      }
-
-      #app {
-        width: 90%;
-        max-width: 1000px;
-        background: var(--panel-bg);
-        border-radius: 8px;
-        padding: 25px;
-        border: 1px solid #2d2f35;
-      }
-
-      header {
-        text-align: center;
-        margin-bottom: 20px;
-      }
-
-      /* Preview Area */
-      .preview-container {
-        background: #000;
-        border: 1px solid #333;
-        padding: 40px;
+        background-color: var(--bg-color);
+        color: var(--text);
+        font-family: sans-serif;
         display: flex;
         justify-content: center;
         align-items: center;
-        position: relative;
-        margin-bottom: 20px;
+        min-height: 100vh;
       }
-
-      canvas {
-        image-rendering: pixelated;
-        box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      #app {
+        background: var(--card-bg);
+        padding: 30px;
+        border-radius: 8px;
+        width: 380px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        border: 1px solid #333;
       }
-
-      .size-label {
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        color: #666;
-        font-size: 12px;
+      .preview-box {
+        background: #000;
+        border: 4px solid #444;
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
       }
-
-      /* Editor Layout */
-      .editor-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 30px;
-      }
-
-      .control-item {
-        margin-bottom: 15px;
-      }
-
-      label {
-        display: block;
-        font-size: 13px;
-        color: #888;
-        margin-bottom: 6px;
-      }
-
-      input[type="text"] {
-        width: 100%;
+      canvas { image-rendering: pixelated; width: 100%; }
+      input, select {
         background: var(--input-bg);
         border: 1px solid #333;
         color: white;
+        padding: 8px;
+        border-radius: 4px;
+      }
+      .row { display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
+      .checkbox-group { display: flex; align-items: center; gap: 5px; }
+      button {
+        background: #3f445b;
+        color: white;
+        border: none;
         padding: 10px;
         border-radius: 4px;
-        font-size: 14px;
-      }
-
-      .color-strip {
-        height: 6px;
-        width: 100%;
-        margin-top: 4px;
-        border-radius: 2px;
-      }
-
-      /* Buttons */
-      .btn-group {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 20px;
-      }
-
-      button {
-        padding: 8px 16px;
-        border: none;
-        border-radius: 4px;
         cursor: pointer;
-        font-weight: 600;
-        font-size: 13px;
-      }
-
-      .btn-blue { background: #007bff; color: white; }
-      .btn-green { background: #1a7a4d; color: white; }
-      .btn-red { background: #d93025; color: white; }
-
-      .download-area {
-        grid-column: span 2;
-        display: flex;
-        justify-content: center;
-        margin-top: 20px;
-      }
-
-      .main-download-btn {
-        background: #2b5797;
-        padding: 15px 50px;
-        font-size: 16px;
+        margin-top: 10px;
       }
     </style>
   </head>
   <body>
     <div id="app">
-      <header>
-        <h2 style="font-weight: 300;">Prefix Generator</h2>
-      </header>
-
-      <div class="preview-container">
-        <span class="size-label" id="resInfo">19x7</span>
-        <canvas id="rankCanvas"></canvas>
-      </div>
-
-      <div class="btn-group">
-        <button class="btn-blue">Copy</button>
-        <button class="btn-red" onclick="location.reload()">Clear</button>
-        <button class="btn-green" onclick="saveImage()">Save</button>
-      </div>
-
-      <div class="editor-grid">
-        <div>
-          <div class="control-item">
-            <label>Rank Name</label>
-            <input type="text" id="rName" value="TEXT">
-          </div>
-          <div class="control-item">
-            <label>Shadow Color</label>
-            <input type="text" id="sColor" value="#22222244">
-            <div id="sStrip" class="color-strip"></div>
-          </div>
-          <div class="control-item">
-            <label>Text Color</label>
-            <input type="text" id="tColor" value="#FFFFFF">
-            <div id="tStrip" class="color-strip"></div>
-          </div>
-        </div>
-
-        <div>
-          <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <button class="btn-green" style="padding: 5px 10px;">Add New Color</button>
-            <span style="font-size: 12px; color: #555;">2 colors</span>
-          </div>
-          <div class="control-item">
-            <label>Background Color 1</label>
-            <input type="text" id="b1Color" value="#00AAFF">
-            <div id="b1Strip" class="color-strip"></div>
-          </div>
-          <div class="control-item">
-            <label>Background Color 2</label>
-            <input type="text" id="b2Color" value="#00CCFF">
-            <div id="b2Strip" class="color-strip"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="download-area">
-        <button class="btn-blue main-download-btn" onclick="saveImage()">Generate & Download</button>
-      </div>
-    </div>
-
-    <script type="module">
-      const canvas = document.getElementById('rankCanvas');
-      const ctx = canvas.getContext('2d');
-
-      function update() {
-        const name = document.getElementById('rName').value.toUpperCase();
-        const tCol = document.getElementById('tColor').value;
-        const sCol = document.getElementById('sColor').value;
-        const b1 = document.getElementById('b1Color').value;
-        const b2 = document.getElementById('b2Color').value;
-
-        // UI Strips aktualisieren
-        document.getElementById('sStrip').style.backgroundColor = sCol.substring(0,7);
-        document.getElementById('tStrip').style.backgroundColor = tCol;
-        document.getElementById('b1Strip').style.backgroundColor = b1;
-        document.getElementById('b2Strip').style.backgroundColor = b2;
-
-        // Canvas Setup
-        ctx.font = '24px "Minecraftia"';
-        const metrics = ctx.measureText(name);
-        canvas.width = metrics.width + 24;
-        canvas.height = 44;
-        
-        document.getElementById('resInfo').innerText = `${Math.round(canvas.width)}x${canvas.height}`;
-
-        // Hintergrund
-        const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-        grad.addColorStop(0, b1);
-        grad.addColorStop(1, b2);
-        ctx.fillStyle = grad;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        // Text
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        
-        // Schatten
-        ctx.fillStyle = sCol;
-        ctx.fillText(name, (canvas.width/2)+2, (canvas.height/2)+2);
-        
-        // Main
-        ctx.fillStyle = tCol;
-        ctx.fillText(name, canvas.width/2, canvas.height/2);
-      }
-
-      window.saveImage = () => {
-        const link = document.createElement('a');
-        link.download = 'rank.png';
-        link.href = canvas.toDataURL();
-        link.click();
-      };
-
-      // Inputs überwachen
-      document.querySelectorAll('input').forEach(i => i.addEventListener('input', update));
+      <input type="text" id="rankName" value="RANK">
       
-      // Erstes Zeichnen
-      setTimeout(update, 500);
-    </script>
+      <div class="preview-box">
+        <canvas id="rankCanvas" width="160" height="40"></canvas>
+      </div>
+
+      <div class="row">
+        <label>Background:</label>
+        <input type="color" id="bgColor" value="#222222">
+      </div>
+
+      <div class="row">
+        <label>Border:</label>
+        <div class="checkbox-group">
+          <input type="color" id="borderColor" value="#555555">
+          <input type="checkbox" id="useBorder" checked>
+        </div>
+      </div>
+
+      <div class="row">
+        <label>Shadow:</label>
+        <div class="checkbox-group">
+          <input type="color" id="shadowColor" value="#111111">
+          <input type="checkbox" id="useShadow" checked>
+        </div>
+      </div>
+
+      <select id="presetSelect">
+        <option value="">Select preset</option>
+        <option value="classic">Classic</option>
+        <option value="emerald">Emerald</option>
+        <option value="gold">Gold</option>
+        <option value="nether">Nether</option>
+      </select>
+
+      <button id="downloadBtn">Download</button>
+    </div>
+    <script type="module" src="/src/main.js"></script>
   </body>
 </html>
