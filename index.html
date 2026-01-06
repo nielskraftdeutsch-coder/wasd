@@ -3,250 +3,283 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ItemsAdder Rank Generator</title>
+    <title>Prefix Generator - ItemsAdder</title>
     <link href="https://fonts.cdnfonts.com/css/minecraftia" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #0f1014;
-            --panel-color: #1e1f26;
-            --input-bg: #2a2c36;
-            --accent-color: #3f4252;
-            --text-color: #e0e0e0;
-            --blue-btn: #3b82f6;
-            --green-btn: #10b981;
-            --red-btn: #ef4444;
+            --bg-dark: #121418;
+            --panel-bg: #1a1c20;
+            --input-bg: #25282e;
+            --accent-blue: #0080ff;
+            --btn-blue: #007bff;
+            --btn-red: #dc3545;
+            --btn-green: #28a745;
+            --text-main: #ffffff;
+            --text-muted: #8e9297;
         }
 
         body {
             font-family: 'Segoe UI', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            background-color: var(--bg-dark);
+            color: var(--text-main);
             margin: 0;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-
-        .main-card {
-            background-color: var(--panel-color);
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
-            width: 500px;
-            text-align: center;
-            border: 1px solid #333;
-        }
-
-        .preview-container {
-            background: #000;
-            padding: 30px;
-            margin-bottom: 25px;
-            border: 2px solid #333;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        canvas {
-            image-rendering: pixelated; /* Erhält den Pixel-Look von Minecraft */
-            max-width: 100%;
-        }
-
-        .control-group {
-            display: flex;
             flex-direction: column;
-            gap: 15px;
-            text-align: left;
+            align-items: center;
+            padding-top: 20px;
         }
 
-        .input-row {
+        h1 { font-weight: 400; margin-bottom: 20px; }
+
+        .main-wrapper {
+            width: 90%;
+            max-width: 1100px;
+            background-color: var(--panel-bg);
+            border-radius: 4px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        /* Top Preview Area */
+        .preview-section {
+            background-color: #0b0c0e;
+            border: 1px solid #2d2f35;
+            height: 150px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        #rankCanvas {
+            image-rendering: pixelated;
+            transform: scale(1.5);
+        }
+
+        .size-indicator {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* Action Buttons Row */
+        .action-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 25px;
+        }
+
+        .btn {
+            border: none;
+            padding: 6px 15px;
+            border-radius: 4px;
+            color: white;
+            cursor: pointer;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-copy { background-color: var(--btn-blue); }
+        .btn-clear { background-color: var(--btn-red); }
+        .btn-save { background-color: var(--btn-green); }
+
+        /* Configuration Grid */
+        .config-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        .col-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
         }
 
         label {
-            font-size: 14px;
-            color: #999;
+            display: block;
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
         }
 
         input[type="text"] {
             width: 100%;
             background: var(--input-bg);
-            border: 1px solid #444;
+            border: 1px solid #333;
             padding: 10px;
             color: white;
             border-radius: 4px;
-            margin-bottom: 10px;
-            font-size: 16px;
+            outline: none;
         }
 
-        input[type="color"] {
-            border: none;
-            width: 40px;
-            height: 25px;
-            cursor: pointer;
-            background: none;
-        }
+        input[type="text"]:focus { border-color: var(--accent-blue); }
 
-        select {
-            background: var(--input-bg);
-            color: white;
-            border: 1px solid #444;
-            padding: 5px;
-            border-radius: 4px;
-            width: 120px;
-        }
-
-        .download-btn {
-            margin-top: 30px;
-            background-color: var(--blue-btn);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
+        .color-preview-bar {
+            height: 10px;
             width: 100%;
-            transition: background 0.2s;
+            background: #fff;
+            margin-top: 5px;
+            border-radius: 2px;
         }
 
-        .download-btn:hover {
-            background-color: #2563eb;
+        /* Right Column Specifics */
+        .bg-color-item {
+            background: var(--input-bg);
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            border: 1px solid #333;
         }
 
-        .checkbox-row {
+        .add-color-btn {
+            background-color: #1a7a4d;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        /* Footer Button */
+        .footer-btn-container {
             display: flex;
-            align-items: center;
-            gap: 10px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .generate-btn {
+            background-color: #204a87;
+            color: white;
+            border: none;
+            padding: 12px 40px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
 
-<div class="main-card">
-    <input type="text" id="rankName" value="RANK" placeholder="Rank Name...">
-    
-    <div class="preview-container">
-        <canvas id="rankCanvas" width="180" height="48"></canvas>
-    </div>
+    <h1>Prefix Generator</h1>
 
-    <div class="control-group">
-        <div class="input-row">
-            <label>Background:</label>
-            <input type="color" id="bgColor" value="#222224">
+    <div class="main-wrapper">
+        <div class="preview-section">
+            <span class="size-indicator" id="sizeDisplay">19x7</span>
+            <canvas id="rankCanvas" width="120" height="35"></canvas>
         </div>
 
-        <div class="input-row">
-            <label>Border:</label>
-            <div class="checkbox-row">
-                <input type="color" id="borderColor" value="#555555">
-                <input type="checkbox" id="useBorder" checked>
+        <div class="action-bar">
+            <button class="btn btn-copy">Copy</button>
+            <button class="btn btn-clear" onclick="location.reload()">Clear</button>
+            <button class="btn btn-save" onclick="downloadImage()">Save</button>
+        </div>
+
+        <div class="config-grid">
+            <div class="col-left">
+                <div class="input-group">
+                    <label>Rank Name</label>
+                    <input type="text" id="rankName" value="TEXT">
+                </div>
+
+                <div class="input-group">
+                    <label>Shadow Color</label>
+                    <input type="text" id="shadowHex" value="#22222244">
+                    <div id="shadowBar" class="color-preview-bar" style="background: #222222;"></div>
+                </div>
+
+                <div class="input-group">
+                    <label>Text Color</label>
+                    <input type="text" id="textHex" value="#FFFFFF">
+                    <div id="textBar" class="color-preview-bar" style="background: #FFFFFF;"></div>
+                </div>
+            </div>
+
+            <div class="col-right">
+                <div class="col-header">
+                    <button class="add-color-btn">Add New Color</button>
+                    <span style="font-size: 12px; color: grey;">2 colors</span>
+                </div>
+
+                <div class="bg-color-item">
+                    <label>Background Color 1</label>
+                    <input type="text" id="bg1Hex" value="#00AAFF">
+                    <div class="color-preview-bar" style="background: #00AAFF;"></div>
+                </div>
+
+                <div class="bg-color-item">
+                    <label>Background Color 2</label>
+                    <input type="text" id="bg2Hex" value="#00CCFF">
+                    <div class="color-preview-bar" style="background: #00CCFF;"></div>
+                </div>
             </div>
         </div>
 
-        <div class="input-row">
-            <label>Shadow:</label>
-            <div class="checkbox-row">
-                <input type="color" id="shadowColor" value="#111111">
-                <input type="checkbox" id="useShadow" checked>
-            </div>
-        </div>
-
-        <div class="input-row">
-            <label>Presets:</label>
-            <select id="presetSelect">
-                <option value="custom">Custom</option>
-                <option value="classic">Classic</option>
-                <option value="emerald">Emerald</option>
-                <option value="gold">Gold</option>
-                <option value="nether">Nether</option>
-                <option value="diamond">Diamond</option>
-            </select>
+        <div class="footer-btn-container">
+            <button class="generate-btn" onclick="downloadImage()">Generate & Download</button>
         </div>
     </div>
 
-    <button class="download-btn" onclick="downloadImage()">Download</button>
-</div>
+    <script>
+        const canvas = document.getElementById('rankCanvas');
+        const ctx = canvas.getContext('2d');
 
-<script>
-    const canvas = document.getElementById('rankCanvas');
-    const ctx = canvas.getContext('2d');
-    
-    // Konfigurationen für Presets
-    const presets = {
-        classic: { bg: '#404040', border: '#707070', shadow: '#1a1a1a' },
-        emerald: { bg: '#105d27', border: '#2ecc71', shadow: '#082e13' },
-        gold: { bg: '#947311', border: '#f1c40f', shadow: '#4a3a08' },
-        nether: { bg: '#4d0d0d', border: '#e74c3c', shadow: '#260606' },
-        diamond: { bg: '#2980b9', border: '#3498db', shadow: '#154360' }
-    };
+        function update() {
+            const name = document.getElementById('rankName').value.toUpperCase();
+            const textCol = document.getElementById('textHex').value;
+            const shadowCol = document.getElementById('shadowHex').value;
+            const bg1 = document.getElementById('bg1Hex').value;
+            const bg2 = document.getElementById('bg2Hex').value;
 
-    function draw() {
-        const text = document.getElementById('rankName').value.toUpperCase();
-        const bgColor = document.getElementById('bgColor').value;
-        const borderColor = document.getElementById('borderColor').value;
-        const shadowColor = document.getElementById('shadowColor').value;
-        const useBorder = document.getElementById('useBorder').checked;
-        const useShadow = document.getElementById('useShadow').checked;
+            // Canvas Größe an Text anpassen
+            ctx.font = '20px "Minecraftia"';
+            const textWidth = ctx.measureText(name).width;
+            canvas.width = textWidth + 20;
+            document.getElementById('sizeDisplay').innerText = `${Math.round(canvas.width)}x${canvas.height}`;
 
-        // Canvas leeren
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // Hintergrund Verlauf
+            const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            grad.addColorStop(0, bg1);
+            grad.addColorStop(1, bg2);
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Hintergrund
-        ctx.fillStyle = bgColor;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        // Rahmen
-        if (useBorder) {
-            ctx.strokeStyle = borderColor;
-            ctx.lineWidth = 8;
-            ctx.strokeRect(0, 0, canvas.width, canvas.height);
+            // Text Rendering
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            // Schatten
+            ctx.fillStyle = shadowCol;
+            ctx.fillText(name, (canvas.width/2) + 2, (canvas.height/2) + 2);
+            
+            // Haupttext
+            ctx.fillStyle = textCol;
+            ctx.fillText(name, canvas.width/2, canvas.height/2);
         }
 
-        // Font Einstellungen
-        ctx.font = '32px "Minecraftia"';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-
-        // Schatten zeichnen
-        if (useShadow) {
-            ctx.fillStyle = shadowColor;
-            ctx.fillText(text, (canvas.width / 2) + 4, (canvas.height / 2) + 4);
+        function downloadImage() {
+            const link = document.createElement('a');
+            link.download = 'prefix.png';
+            link.href = canvas.toDataURL();
+            link.click();
         }
 
-        // Haupttext zeichnen
-        ctx.fillStyle = '#FFFFFF';
-        ctx.fillText(text, canvas.width / 2, canvas.height / 2);
-    }
-
-    // Event Listener für Echtzeit-Update
-    document.querySelectorAll('input, select').forEach(el => {
-        el.addEventListener('input', () => {
-            if(el.id === 'presetSelect' && el.value !== 'custom') {
-                const p = presets[el.value];
-                document.getElementById('bgColor').value = p.bg;
-                document.getElementById('borderColor').value = p.border;
-                document.getElementById('shadowColor').value = p.shadow;
-            }
-            draw();
-        });
-    });
-
-    function downloadImage() {
-        const link = document.createElement('a');
-        link.download = `rank_${document.getElementById('rankName').value}.png`;
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-    }
-
-    // Initialer Zeichenvorgang
-    window.onload = () => {
-        // Warte kurz, bis die Font geladen ist
-        setTimeout(draw, 500);
-    };
-</script>
-
+        // Live-Update
+        document.querySelectorAll('input').forEach(i => i.addEventListener('input', update));
+        
+        // Initialer Start nach Font-Load
+        window.onload = () => setTimeout(update, 500);
+    </script>
 </body>
 </html>
