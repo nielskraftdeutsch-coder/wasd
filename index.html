@@ -1,252 +1,226 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>RankStudio - Minecraft Generator</title>
-
-    <meta name="description" content="Create pixel-perfect Minecraft rank badges." />
-    <meta property="og:title" content="Minecraft Rank Generator" />
-    <meta property="og:type" content="website" />
-
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minecraft Rank Generator</title>
     <link href="https://fonts.cdnfonts.com/css/minecraftia" rel="stylesheet">
-    
     <style>
-      :root {
-        --bg-dark: #121418;
-        --panel-bg: #1a1c20;
-        --input-bg: #25282e;
-        --accent-blue: #007bff;
-        --text-white: #ffffff;
-      }
+        :root {
+            --bg: #0c0d10;
+            --panel: #16181d;
+            --input: #202228;
+            --blue: #007bff;
+            --text: #ffffff;
+        }
 
-      body {
-        margin: 0;
-        background-color: var(--bg-dark);
-        color: var(--text-white);
-        font-family: 'Segoe UI', Tahoma, sans-serif;
-        display: flex;
-        justify-content: center;
-        padding: 40px 20px;
-      }
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            padding: 50px 20px;
+            margin: 0;
+        }
 
-      #app {
-        width: 100%;
-        max-width: 1050px;
-        background: var(--panel-bg);
-        border-radius: 4px;
-        padding: 25px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-      }
+        #app {
+            width: 100%;
+            max-width: 900px;
+            background: var(--panel);
+            padding: 25px;
+            border-radius: 4px;
+            border: 1px solid #2d2f35;
+        }
 
-      .preview-box {
-        background: #000;
-        border: 1px solid #333;
-        height: 160px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        position: relative;
-        margin-bottom: 20px;
-      }
+        /* Preview Bereich - Minecraft Style */
+        .preview-area {
+            background-color: #000;
+            border: 1px solid #333;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+            position: relative;
+        }
 
-      canvas {
-        image-rendering: pixelated;
-        transform: scale(1.2); /* Etwas größer für bessere Sichtbarkeit */
-      }
+        canvas {
+            image-rendering: pixelated; /* Macht es scharf/pixelig wie in MC */
+            transform: scale(4); /* Vergrößerte Ansicht für den Editor */
+            border: 0.25px solid #222;
+        }
 
-      .res-tag {
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        font-size: 12px;
-        color: #666;
-      }
+        .size-info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 11px;
+            color: #555;
+        }
 
-      .action-row {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 30px;
-      }
+        /* Editor Layout */
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
 
-      button {
-        border: none;
-        padding: 8px 18px;
-        border-radius: 4px;
-        color: white;
-        cursor: pointer;
-        font-size: 13px;
-        font-weight: 600;
-      }
+        .input-box { margin-bottom: 15px; }
 
-      .btn-blue { background: #007bff; }
-      .btn-red { background: #dc3545; }
-      .btn-green { background: #28a745; }
+        label {
+            display: block;
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
 
-      /* Spalten Layout wie im Bild */
-      .editor-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 50px;
-      }
+        input {
+            width: 100%;
+            background: var(--input);
+            border: 1px solid #333;
+            color: #fff;
+            padding: 10px;
+            border-radius: 3px;
+            outline: none;
+        }
 
-      .input-field {
-        margin-bottom: 20px;
-      }
+        input:focus { border-color: var(--blue); }
 
-      label {
-        display: block;
-        font-size: 13px;
-        color: #999;
-        margin-bottom: 8px;
-      }
+        .color-preview {
+            height: 4px;
+            margin-top: 3px;
+            border-radius: 2px;
+        }
 
-      input[type="text"] {
-        width: 100%;
-        background: var(--input-bg);
-        border: 1px solid #333;
-        padding: 12px;
-        color: white;
-        border-radius: 4px;
-        box-sizing: border-box;
-      }
+        button {
+            cursor: pointer;
+            border: none;
+            border-radius: 3px;
+            font-weight: bold;
+        }
 
-      .color-line {
-        height: 5px;
-        width: 100%;
-        margin-top: 5px;
-        border-radius: 2px;
-      }
+        .btn-main {
+            background: var(--blue);
+            color: white;
+            padding: 15px;
+            width: 100%;
+            margin-top: 20px;
+            font-size: 16px;
+        }
 
-      .generate-container {
-        display: flex;
-        justify-content: center;
-        margin-top: 40px;
-      }
-
-      .btn-download-main {
-        background: #204a87;
-        padding: 15px 60px;
-        font-size: 16px;
-      }
+        .btn-group { display: flex; gap: 10px; margin-bottom: 20px; }
+        .btn-small { padding: 5px 15px; font-size: 12px; }
+        .red { background: #d93025; color: white; }
     </style>
-  </head>
-  <body>
+</head>
+<body>
 
-    <div id="app">
-        <header style="text-align: center; margin-bottom: 20px;">
-            <h1 style="font-weight: 400; font-size: 24px;">Prefix Generator</h1>
-        </header>
+<div id="app">
+    <header style="text-align: center; margin-bottom: 20px;">
+        <h2 style="font-weight: 300; letter-spacing: 1px;">RANK GENERATOR</h2>
+    </header>
 
-        <div class="preview-box">
-            <span class="res-tag" id="resText">19x7</span>
-            <canvas id="rankCanvas" width="150" height="40"></canvas>
-        </div>
+    <div class="preview-area">
+        <span class="size-info" id="dimensions">0 x 0</span>
+        <canvas id="rankCanvas"></canvas>
+    </div>
 
-        <div class="action-row">
-            <button class="btn-blue">Copy</button>
-            <button class="btn-red" onclick="location.reload()">Clear</button>
-            <button class="btn-green" onclick="downloadImg()">Save</button>
-        </div>
+    <div class="btn-group">
+        <button class="btn-small red" onclick="location.reload()">Reset</button>
+    </div>
 
-        <div class="editor-grid">
-            <div>
-                <div class="input-field">
-                    <label>Rank Name</label>
-                    <input type="text" id="rankInput" value="TEXT">
-                </div>
-                <div class="input-field">
-                    <label>Shadow Color</label>
-                    <input type="text" id="shadowHex" value="#22222244">
-                    <div id="shadowPreview" class="color-line"></div>
-                </div>
-                <div class="input-field">
-                    <label>Text Color</label>
-                    <input type="text" id="textHex" value="#FFFFFF">
-                    <div id="textPreview" class="color-line"></div>
-                </div>
+    <div class="grid">
+        <div>
+            <div class="input-box">
+                <label>Rank Name</label>
+                <input type="text" id="name" value="ADMIN">
             </div>
-
-            <div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
-                    <button class="btn-green" style="padding: 5px 12px;">Add New Color</button>
-                    <span style="color: #555; font-size: 12px;">2 colors</span>
-                </div>
-                <div class="input-field">
-                    <label>Background Color 1</label>
-                    <input type="text" id="bg1Hex" value="#00AAFF">
-                    <div id="bg1Preview" class="color-line"></div>
-                </div>
-                <div class="input-field">
-                    <label>Background Color 2</label>
-                    <input type="text" id="bg2Hex" value="#00CCFF">
-                    <div id="bg2Preview" class="color-line"></div>
-                </div>
+            <div class="input-box">
+                <label>Text Farbe (Hex)</label>
+                <input type="text" id="tCol" value="#FFFFFF">
+                <div id="tPre" class="color-preview"></div>
+            </div>
+            <div class="input-box">
+                <label>Schatten Farbe (Hex)</label>
+                <input type="text" id="sCol" value="#3f3f3f">
+                <div id="sPre" class="color-preview"></div>
             </div>
         </div>
-
-        <div class="generate-container">
-            <button class="btn-blue btn-download-main" onclick="downloadImg()">Generate & Download</button>
+        <div>
+            <label style="margin-bottom: 15px;">Hintergrund Verlauf</label>
+            <div class="input-box">
+                <label>Oben</label>
+                <input type="text" id="b1" value="#ff5555">
+                <div id="b1Pre" class="color-preview"></div>
+            </div>
+            <div class="input-box">
+                <label>Unten</label>
+                <input type="text" id="b2" value="#aa0000">
+                <div id="b2Pre" class="color-preview"></div>
+            </div>
         </div>
     </div>
 
-    <script type="module">
-      const canvas = document.getElementById('rankCanvas');
-      const ctx = canvas.getContext('2d');
+    <button class="btn-main" onclick="download()">GENERATE & DOWNLOAD (.PNG)</button>
+</div>
 
-      function draw() {
-        const name = document.getElementById('rankInput').value.toUpperCase();
-        const tCol = document.getElementById('textHex').value;
-        const sCol = document.getElementById('shadowHex').value;
-        const b1 = document.getElementById('bg1Hex').value;
-        const b2 = document.getElementById('bg2Hex').value;
+<script>
+    const canvas = document.getElementById('rankCanvas');
+    const ctx = canvas.getContext('2d');
 
-        // Preview Lines updaten
-        document.getElementById('shadowPreview').style.backgroundColor = sCol.substring(0,7);
-        document.getElementById('textPreview').style.backgroundColor = tCol;
-        document.getElementById('bg1Preview').style.backgroundColor = b1;
-        document.getElementById('bg2Preview').style.backgroundColor = b2;
+    function render() {
+        const text = document.getElementById('name').value.toUpperCase();
+        const textColor = document.getElementById('tCol').value;
+        const shadowColor = document.getElementById('sCol').value;
+        const bgTop = document.getElementById('b1').value;
+        const bgBottom = document.getElementById('b2').value;
 
-        // Canvas anpassen
-        ctx.font = '24px "Minecraftia"';
-        const textWidth = ctx.measureText(name).width;
-        canvas.width = textWidth + 30;
-        canvas.height = 45;
+        // UI Previews
+        document.getElementById('tPre').style.backgroundColor = textColor;
+        document.getElementById('sPre').style.backgroundColor = shadowColor;
+        document.getElementById('b1Pre').style.backgroundColor = bgTop;
+        document.getElementById('b2Pre').style.backgroundColor = bgBottom;
+
+        // Minecraft Font Größe berechnen (klein für Pixel-Look)
+        ctx.font = '8px "Minecraftia"'; 
+        const textWidth = Math.ceil(ctx.measureText(text).width);
         
-        document.getElementById('resText').innerText = `${Math.round(canvas.width)}x${canvas.height}`;
+        // Canvas Größe setzen (Minecraft Ranks sind meist 7-9 Pixel hoch)
+        canvas.width = textWidth + 4;
+        canvas.height = 9;
+        document.getElementById('dimensions').innerText = canvas.width + " x " + canvas.height;
 
-        // Hintergrund-Verlauf
-        const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-        gradient.addColorStop(0, b1);
-        gradient.addColorStop(1, b2);
-        ctx.fillStyle = gradient;
+        // Hintergrund zeichnen
+        const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+        grad.addColorStop(0, bgTop);
+        grad.addColorStop(1, bgBottom);
+        ctx.fillStyle = grad;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Text Zeichnen
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        
-        // Schatten (leicht versetzt)
-        ctx.fillStyle = sCol;
-        ctx.fillText(name, (canvas.width/2) + 2, (canvas.height/2) + 2);
-        
-        // Vordergrund
-        ctx.fillStyle = tCol;
-        ctx.fillText(name, canvas.width/2, canvas.height/2);
-      }
+        // Text Schatten (Minecraft Style: 1px versetzt)
+        ctx.fillStyle = shadowColor;
+        ctx.fillText(text, 2.5, 7.5);
 
-      window.downloadImg = () => {
+        // Haupt-Text
+        ctx.fillStyle = textColor;
+        ctx.fillText(text, 2, 7);
+    }
+
+    function download() {
         const link = document.createElement('a');
-        link.download = 'minecraft_rank.png';
-        link.href = canvas.toDataURL();
+        link.download = 'rank.png';
+        link.href = canvas.toDataURL('image/png');
         link.click();
-      };
+    }
 
-      // Echtzeit-Events
-      document.querySelectorAll('input').forEach(el => el.addEventListener('input', draw));
+    // Live Update
+    document.querySelectorAll('input').forEach(i => i.addEventListener('input', render));
+    
+    // Initialer Start (Warten auf Font-Load)
+    document.fonts.ready.then(render);
+</script>
 
-      // Initialer Render
-      setTimeout(draw, 300);
-    </script>
-  </body>
+</body>
 </html>
