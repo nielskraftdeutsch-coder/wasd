@@ -8,7 +8,7 @@
 <style>
 body{
     margin:0;
-    background:#0b0d10;
+    background:#0c0e11;
     font-family:Segoe UI,sans-serif;
     color:#fff;
     display:flex;
@@ -16,39 +16,39 @@ body{
     padding:40px;
 }
 
-#app{
-    width:900px;
-    background:#14161b;
-    border:1px solid #2a2d34;
-    border-radius:8px;
-    padding:25px;
+.panel{
+    width:850px;
+    background:#1a1c20;
+    border-radius:10px;
+    padding:30px;
+    box-shadow:0 10px 40px #000a;
 }
 
-h1{
+/* INPUT OBEN */
+.rank-input{
+    width:260px;
+    margin:0 auto 25px auto;
+}
+
+.rank-input input{
+    width:100%;
+    padding:10px;
+    background:#121318;
+    border:1px solid #444;
+    color:#7fb3ff;
+    border-radius:6px;
+    font-size:14px;
     text-align:center;
-    font-weight:400;
-    margin-bottom:25px;
 }
 
 /* PREVIEW */
-.preview{
-    background:#000;
-    border:1px solid #333;
-    border-radius:4px;
-    height:170px;
+.preview-box{
+    background:#2a2a2a;
+    border-radius:8px;
+    padding:25px;
     display:flex;
-    align-items:center;
     justify-content:center;
-    position:relative;
-    margin-bottom:25px;
-}
-
-.preview span{
-    position:absolute;
-    top:8px;
-    left:10px;
-    font-size:12px;
-    color:#777;
+    margin-bottom:30px;
 }
 
 canvas{
@@ -56,121 +56,98 @@ canvas{
     transform:scale(4);
 }
 
-/* UI */
-.grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:30px;
+/* OPTIONS */
+.options{
+    max-width:400px;
+    margin:0 auto;
 }
 
-label{
-    font-size:12px;
-    color:#888;
-    text-transform:uppercase;
-}
-
-input{
-    width:100%;
-    background:#1e2126;
-    border:1px solid #333;
-    padding:10px;
-    color:white;
-    border-radius:4px;
-    margin-bottom:12px;
-}
-
-.toggle{
+.row{
     display:flex;
     align-items:center;
-    gap:8px;
-    margin-bottom:10px;
+    justify-content:space-between;
+    margin-bottom:15px;
 }
 
-button{
-    width:100%;
-    background:#007bff;
+.row label{
+    color:#aaa;
+    font-size:14px;
+}
+
+.row input[type="color"]{
+    width:50px;
+    height:26px;
     border:none;
-    padding:15px;
-    font-weight:bold;
-    color:white;
-    border-radius:4px;
+    background:none;
     cursor:pointer;
+}
+
+.row input[type="checkbox"]{
+    transform:scale(1.2);
 }
 </style>
 </head>
 
 <body>
-<div id="app">
+<div class="panel">
 
-<h1>Rank Generator</h1>
-
-<div class="preview">
-    <span id="sizeLabel"></span>
-    <canvas id="c"></canvas>
+<div class="rank-input">
+    <input id="rankText" value="creator">
 </div>
 
-<div class="grid">
-    <div>
-        <label>Rank Name</label>
-        <input id="text" value="CREATOR">
-
-        <label>Text Farbe</label>
-        <input id="tCol" value="#ffffff">
-
-        <label>Schatten Farbe</label>
-        <input id="sCol" value="#000000aa">
-
-        <div class="toggle">
-            <input type="checkbox" id="shadow" checked>
-            <label>Shadow</label>
-        </div>
-
-        <div class="toggle">
-            <input type="checkbox" id="border" checked>
-            <label>Border</label>
-        </div>
-    </div>
-
-    <div>
-        <label>Background Farben (oben → unten)</label>
-        <input class="bg" value="#3b3b3b">
-        <input class="bg" value="#1f1f1f">
-    </div>
+<div class="preview-box">
+    <canvas id="rankCanvas"></canvas>
 </div>
 
-<br>
-<button onclick="download()">DOWNLOAD PNG</button>
+<div class="options">
+    <div class="row">
+        <label>Background</label>
+        <input type="color" id="bgColor" value="#3a3a3a">
+    </div>
+
+    <div class="row">
+        <label>Text</label>
+        <input type="color" id="textColor" value="#ffffff">
+    </div>
+
+    <div class="row">
+        <label>Border</label>
+        <input type="checkbox" id="border" checked>
+    </div>
+
+    <div class="row">
+        <label>Shadow</label>
+        <input type="checkbox" id="shadow" checked>
+    </div>
+</div>
 
 </div>
 
 <script>
-const c = document.getElementById("c");
-const ctx = c.getContext("2d");
+const canvas = document.getElementById("rankCanvas");
+const ctx = canvas.getContext("2d");
 
 function render(){
-    const text = text.value;
-    const tColor = tCol.value;
-    const sColor = sCol.value;
-    const bg = [...document.querySelectorAll(".bg")].map(i=>i.value);
-    const drawShadow = shadow.checked;
+    const text = rankText.value;
+    const bg = bgColor.value;
+    const tCol = textColor.value;
     const drawBorder = border.checked;
+    const drawShadow = shadow.checked;
 
     ctx.font = '8px "Minecraftia"';
     const w = Math.ceil(ctx.measureText(text).width) + 6;
     const h = 10;
 
-    c.width = w;
-    c.height = h;
+    canvas.width = w;
+    canvas.height = h;
 
     // Background
-    const g = ctx.createLinearGradient(0,0,0,h);
-    bg.forEach((c,i)=>g.addColorStop(i/(bg.length-1),c));
-    ctx.fillStyle = g;
+    ctx.fillStyle = bg;
     ctx.fillRect(0,0,w,h);
 
     // Border
     if(drawBorder){
-        ctx.fillStyle="#555";
+        ctx.fillStyle="#777";
         ctx.fillRect(0,0,w,1);
         ctx.fillRect(0,h-1,w,1);
         ctx.fillRect(0,0,1,h);
@@ -179,22 +156,13 @@ function render(){
 
     // Shadow
     if(drawShadow){
-        ctx.fillStyle = sColor;
+        ctx.fillStyle="#000a";
         ctx.fillText(text,4,9);
     }
 
     // Text
-    ctx.fillStyle = tColor;
+    ctx.fillStyle=tCol;
     ctx.fillText(text,3,8);
-
-    sizeLabel.textContent = `Final Size: ${w}×${h}px`;
-}
-
-function download(){
-    const a=document.createElement("a");
-    a.download="rank.png";
-    a.href=c.toDataURL();
-    a.click();
 }
 
 document.querySelectorAll("input").forEach(i=>i.oninput=render);
